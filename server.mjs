@@ -1,8 +1,12 @@
 import express from 'express';
 import axios from 'axios';
+import cors from 'cors';  // Import CORS package
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Enable CORS for all origins (adjust for specific origins if needed)
+app.use(cors());
 
 app.get('/api/fetchHindi', async (req, res) => {
   try {
