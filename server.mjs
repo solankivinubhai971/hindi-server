@@ -8,12 +8,11 @@ app.use(cors());
 
 const PORT = process.env.PORT || 5000;  // Port for the server
 
-// Route to fetch Hindi server data
 app.get('/api/fetchHindi', async (req, res) => {
-  const { title, episode, type } = req.query;
+  const { title, ep, type } = req.query;
 
-  if (!title || (!episode && type !== 'movie')) {
-    return res.status(400).json({ error: 'Missing title or episode/movie type in query' });
+  if (!title || (!ep && type !== 'movie')) {
+    return res.status(400).json({ error: 'Missing title or ep/movie type in query' });
   }
 
   const cleanedTitle = decodeURIComponent(title)
@@ -21,10 +20,9 @@ app.get('/api/fetchHindi', async (req, res) => {
     .trim()
     .replace(/\s+/g, ' ');
 
-  // Decide endpoint based on type
   const apiUrl = type === 'movie'
     ? `https://aniverse.top/src/ajax/hindi2.php?id=${encodeURIComponent(cleanedTitle)}`
-    : `https://aniverse.top/src/ajax/hindi.php?id=${encodeURIComponent(cleanedTitle)}&ep=${episode}`;
+    : `https://aniverse.top/src/ajax/hindi.php?id=${encodeURIComponent(cleanedTitle)}&ep=${ep}`;
 
   try {
     const response = await axios.get(apiUrl);
@@ -33,6 +31,7 @@ app.get('/api/fetchHindi', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch Hindi servers', message: error.message });
   }
 });
+
 
 
 // Start the server
