@@ -12,19 +12,16 @@ app.get('/api/fetchHindi', async (req, res) => {
     const rawTitle = req.query.title || '';
     const ep = req.query.ep;
 
-    if (!rawTitle) {
-      return res.status(400).json({ error: 'Missing title parameter' });
+    // Ensure the title and episode are present
+    if (!rawTitle || !ep) {
+      return res.status(400).json({ error: 'Missing title or episode parameter' });
     }
 
     const decodedTitle = decodeURIComponent(rawTitle);
     const safeTitle = encodeURIComponent(decodedTitle);
 
-    // ✅ Auto-detect movies and remove ep
-    const isMovie = decodedTitle.toLowerCase().includes('movie');
-
-    const apiURL = (!isMovie && ep)
-      ? `https://aniverse.top/src/ajax/hindi.php?id=${safeTitle}&ep=${encodeURIComponent(ep)}`
-      : `https://aniverse.top/src/ajax/hindi2.php?id=${safeTitle}`;
+    // Only fetch anime data (assuming ep is required for anime)
+    const apiURL = `https://aniverse.top/src/ajax/hindi.php?id=${safeTitle}&ep=${encodeURIComponent(ep)}`;
 
     console.log('Fetching from:', apiURL);
 
