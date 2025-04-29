@@ -22,10 +22,7 @@ app.get('/api/fetchHindi', async (req, res) => {
     // ✅ Auto-detect movies and remove ep
     const isMovie = decodedTitle.toLowerCase().includes('movie');
 
-    // Handle Movie URL
-    const apiURL = isMovie 
-      ? `https://aniverse.top/src/ajax/hindi_combined.php?id=${safeTitle}`
-      : ep 
+    const apiURL = (!isMovie && ep)
       ? `https://aniverse.top/src/ajax/hindi.php?id=${safeTitle}&ep=${encodeURIComponent(ep)}`
       : `https://aniverse.top/src/ajax/hindi2.php?id=${safeTitle}`;
 
