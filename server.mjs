@@ -1,31 +1,36 @@
 import express from 'express';
 import axios from 'axios';
-import cors from 'cors';  // Import CORS package
+import cors from 'cors';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Enable CORS for all origins (adjust for specific origins if needed)
+// Enable CORS for all origins
 app.use(cors());
 
 app.get('/api/fetchHindi', async (req, res) => {
   try {
     let { title, ep } = req.query;
 
+    // Check if title is provided, else return error
     if (!title) {
       return res.status(400).json({ error: 'Missing title in query' });
     }
 
+    // Properly encode title and episode (ep) to ensure they are valid URL components
+    title = encodeURIComponent(title);
+    ep = ep ? encodeURIComponent(ep) : undefined;
+
     // Decide API URL: if episode is given => hindi.php, else => hindi2.php
     let apiURL = ep
-      ? `https://aniverse.top/src/ajax/hindi.php?id=${encodeURIComponent(title)}&ep=${ep}`
-      : `https://aniverse.top/src/ajax/hindi2.php?id=${encodeURIComponent(title)}`;
+      ? `https://aniverse.top/src/ajax/hindi.php?id=${title}&ep=${ep}`
+      : `https://aniverse.top/src/ajax/hindi2.php?id=${title}`;
 
     console.log(`Fetching: ${apiURL}`);
 
     const response = await axios.get(apiURL, {
       headers: {
-        'User-Agent': 'Mozilla/5.0',  // Basic fake UA, not mandatory here
+        'User-Agent': 'Mozilla/5.0',  // Basic fake UA
         'Accept': 'application/json, text/plain, */*',
       }
     });
