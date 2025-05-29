@@ -9,19 +9,14 @@ app.use(cors());
 
 app.get('/api/fetchHindi', async (req, res) => {
   try {
-    const rawTitle = req.query.title || '';
+    const title = req.query.title || '';
     const ep = req.query.ep;
 
-    // Ensure the title and episode are present
-    if (!rawTitle || !ep) {
+    if (!title || !ep) {
       return res.status(400).json({ error: 'Missing title or episode parameter' });
     }
 
-    const decodedTitle = decodeURIComponent(rawTitle);
-    const safeTitle = encodeURIComponent(decodedTitle);
-
-    // Only fetch anime data (assuming ep is required for anime)
-    const apiURL = `https://aniverse.top/src/ajax/hindi.php?id=${safeTitle}&ep=${encodeURIComponent(ep)}`;
+    const apiURL = `https://aniverse.top/src/ajax/t.php?title=${encodeURIComponent(title)}&ep=${encodeURIComponent(ep)}`;
 
     console.log('Fetching from:', apiURL);
 
@@ -31,11 +26,30 @@ app.get('/api/fetchHindi', async (req, res) => {
       }
     });
 
-    res.status(200).json(response.data);
+    const data = response.data;
+
+    // Check for success status
+    if (data.status !== 'success') {
+      return res.status(404).json({ error: 'No sources found' });
+    }
+
+    // Optionally: Only return the decoded embed URLs if needed
+    const sources = data.dub_sources?.map(src => ({
+      provider: src.decoded?.provider,
+      url: src.decoded?.url_or_embed
+    }));
+
+    res.status(200).json({
+      episode_url: data.episode_url,
+      sources,
+      cached: data.cached,
+      timestamp: data.timestamp
+    });
+
   } catch (error) {
     console.error('Fetch error:', error.message);
     res.status(500).json({
-      error: 'Could not fetch Hindi server',
+      error: 'Could not fetch Hindi dub data',
       message: error.response?.data || error.message
     });
   }
